@@ -56,8 +56,11 @@ get you up and running.
 1. [Start hacking](https://railsforzombies.org/)
 1. [Test your changes](https://www.relishapp.com/rspec/rspec-core/docs)
    ```shell
-   docker-compose exec hackweek rspec
+   docker compose run hackweek bundle exec rspec
    ```
+   Note: For running tests, use `docker compose run` instead of `docker compose exec`.
+   The tests require chromedriver for JavaScript/feature tests. Place the chromedriver
+   binary in `bin/chromedriver` if not already present.
 1. [Send pull request](https://help.github.com/articles/using-pull-requests)
 1. $UCCE$$
 
