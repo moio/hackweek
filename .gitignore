@@ -60,3 +60,6 @@ nbproject
 *.iws
 .idea/
 .vagrant/
+
+# Ignore chromedriver binary (for test environment)
+/bin/chromedriver

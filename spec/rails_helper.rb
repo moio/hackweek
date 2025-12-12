@@ -1,5 +1,28 @@
 require 'simplecov'
+
+# Configure webdrivers to not try to download anything
+# In sandboxed environments, we assume chromedriver is already available
 require 'webdrivers'
+
+# Patch Webdrivers to skip network calls
+module Webdrivers
+  class Chromedriver < Common
+    def self.update
+      # Skip update in sandboxed environment
+      nil
+    end
+
+    def self.install
+      # Skip install in sandboxed environment
+      nil
+    end
+
+    def self.remove
+      # Skip remove in sandboxed environment
+      nil
+    end
+  end
+end
 
 if ENV['TRAVIS']
   require 'coveralls'
@@ -37,11 +60,18 @@ RSpec.configure do |config|
 
   Capybara.register_driver :chrome_headless do |app|
     options = ::Selenium::WebDriver::Chrome::Options.new
+    options.binary = '/usr/bin/chromium-browser' # Use system chromium
     options.args << '--window-size=1920x1080'
     options.args << '--headless'
     options.args << '--no-sandbox'
     options.args << '--disable-gpu'
-    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+    options.args << '--disable-dev-shm-usage' # Overcome limited resource problems
+
+    # Use our local chromedriver to avoid network downloads
+    chromedriver_path = Rails.root.join('bin/chromedriver').to_s
+    service = Selenium::WebDriver::Service.chrome(path: chromedriver_path)
+
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options, service: service)
   end
 
   Capybara.javascript_driver = :chrome_headless
