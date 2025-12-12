@@ -13,6 +13,19 @@ jobs:
     name: spec
     env:
       RAILS_ENV: test
+      DB_HOST: 127.0.0.1
+    services:
+      db:
+        image: registry.opensuse.org/opensuse/mariadb:latest
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
@@ -20,7 +33,6 @@ jobs:
           bundler-cache: true
       - name: Prepare spec
         run: |
-          sudo systemctl start mysql.service
           wget -nv http://sphinxsearch.com/files/dicts/en.pak
           bundle exec rake dev:bootstrap --trace
           bundle exec bin/rake webdrivers:chromedriver:update

@@ -1,6 +1,8 @@
 <%
   if ENV['CONTAINER']
     host = 'db'
+  elsif ENV['DB_HOST']
+    host = ENV['DB_HOST']
   end
 %>
 
